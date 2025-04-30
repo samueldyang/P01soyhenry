@@ -84,7 +84,7 @@ def get_director(nombre_director: str):
     peliculas_director = df[(df['job'] == 'Director') & (df['name'].str.lower() == nombre_director.lower())]
     if peliculas_director.empty:
         return {"mensaje": f"No se encontró al director '{nombre_director}' o no tiene películas en el dataset."}
-    ids_peliculas_director = peliculas_director['movie_id'].tolist()
+    ids_peliculas_director = peliculas_director['id'].tolist()
     peliculas_director_movies = df[df['id'].isin(ids_peliculas_director)].copy()
     peliculas_director_movies['release_date'] = pd.to_datetime(peliculas_director_movies['release_date'], errors='coerce')
     retorno_promedio = peliculas_director_movies['return'].mean() if not peliculas_director_movies.empty else 0
