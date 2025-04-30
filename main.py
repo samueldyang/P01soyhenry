@@ -80,8 +80,10 @@ def get_actor(nombre_actor: str):
 
 def get_director(nombre_director: str):
     if df is None:
-        return {"mensaje": "Error: DataFrameno cargado."}
-    peliculas_director = df[(df['job'] == 'Director') & (df['name'].str.lower() == nombre_director.lower())]
+        return {"mensaje": "Error: DataFrame no cargado."}
+    df['name_lower'] = df['name'].str.lower()
+    peliculas_director = df[(df['job'].str.lower() == 'director') & (df['name'].str.lower() == nombre_director.lower())]
+    df.drop(columns=['name_lower'], inplace=True)
     if peliculas_director.empty:
         return {"mensaje": f"No se encontró al director '{nombre_director}' o no tiene películas en el dataset."}
     ids_peliculas_director = peliculas_director['id'].tolist()
