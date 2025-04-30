@@ -8,14 +8,9 @@ app = FastAPI()
 try:
     df = pd.read_csv("dataset_concatenado.csv")
     df['release_date'] = pd.to_datetime(df['release_date'], errors='coerce')
-    try:
-        df_credits = pd.read_csv("credits.csv")
-    except FileNotFoundError:
-        df_credits = None
-        print("Error: No se encontró el archivo credits.csv. Algunas funciones no estarán disponibles.")
+
 except FileNotFoundError:
     df = None
-    df_credits = None
     print("Error: No se encontró el archivo dataset_concatenado.csv. La API no funcionará correctamente.")
 
 # --- Funciones Adicionales ---
