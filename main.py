@@ -2,9 +2,57 @@ from fastapi import FastAPI, Path
 from pydantic import BaseModel
 import pandas as pd
 import ast
+import os
+import requests
+from tqdm import tqdm
 
 app = FastAPI()
 
+# --- Configuración para dataset_concatenado.csv ---
+DATASET_GDRIVE_ID = "1IMOhCjL_vJWUyelFa-uJUiGfph7sgA4Y"
+DATASET_DOWNLOAD_URL = f"https://drive.google.com/uc?export=download&id={DATASET_GDRIVE_ID}"
+DATASET_LOCAL_PATH = "data/dataset_concatenado.csv"
+
+# --- Descargar función ---
+def download_file_from_gdrive(file_id: str, local_path: str, description: str):
+    download_url = f"https://drive.google.com/uc?export=download&id={file_id}"
+    if not os.path.exists(local_path):
+        os.makedirs(os.path.dirname(local_path), exist_ok=True)
+        print(f"Downloading {description} from Google Drive...")
+        try:
+            response = requests.get(download_url, stream=True)
+            response.raise_for_status()
+            total_size_in_bytes = int(response.headers.get('content-length', 0))
+            block_size = 1024
+            progress_bar = tqdm(total=total_size_in_bytes, unit='i', unit_scale=True)
+            with open(local_path, 'wb') as f:
+                for chunk in response.iter_content(chunk_size=block_size):
+                    progress_bar.update(len(chunk))
+                    f.write(chunk)
+            progress_bar.close()
+            if total_size_in_bytes != 0 and progress_bar.n != total_size_in_bytes:
+                print(f"ERROR! something went wrong with {description} download")
+            else:
+                print(f"{description} downloaded successfully.")
+        except requests.exceptions.RequestException as e:
+            print(f"Error downloading {description}: {e}")
+            return False
+    return True
+
+# --- Cargar DataFrame ---
+df = None
+
+if download_file_from_gdrive(DATASET_GDRIVE_ID, DATASET_LOCAL_PATH, "dataset_concatenado.csv"):
+    try:
+        df = pd.read_csv(DATASET_LOCAL_PATH)
+        df['release_date'] = pd.to_datetime(df['release_date'], errors='coerce')
+    except FileNotFoundError:
+        print("Error: No se encontró el archivo dataset_concatenado.csv localmente.")
+else:
+    df = None
+    print("Error: No se pudo descargar dataset_concatenado.csv. La API no funcionará correctamente.")
+
+# --- Funciones ---
 try:
     df = pd.read_csv("dataset_concatenado.csv")
     df['release_date'] = pd.to_datetime(df['release_date'], errors='coerce')
