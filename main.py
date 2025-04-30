@@ -3,15 +3,17 @@ from pydantic import BaseModel
 import pandas as pd
 import ast
 
+# --- Leemos el Archivo ---
 app = FastAPI()
+DATASET_GITHUB_URL = "https://raw.githubusercontent.com/samueldyang/P01soyhenry/refs/heads/main/dataset_concatenado.csv"
 
 try:
-    df = pd.read_csv("dataset_concatenado.csv")
+    df = pd.read_csv(DATASET_GITHUB_URL)
     df['release_date'] = pd.to_datetime(df['release_date'], errors='coerce')
-
-except FileNotFoundError:
+    print("DataFrame cargado exitosamente desde GitHub.")
+except Exception as e:
     df = None
-    print("Error: No se encontró el archivo dataset_concatenado.csv. La API no funcionará correctamente.")
+    print(f"Error al leer el archivo CSV desde GitHub: {e}")
 
 # --- Funciones Adicionales ---
 def cantidad_filmaciones_mes(mes: str):
@@ -63,7 +65,7 @@ def votos_titulo(titulo_de_la_filmacion: str):
     return {"mensaje": f"La película '{pelicula['title'].iloc[0]}' fue estrenada en el año {anio_estreno}. La misma cuenta con un total de {cantidad_votos} valoraciones, con un promedio de {promedio_votos}."}
 
 def get_actor(nombre_actor: str):
-    if df_credits is None or df is None:
+    if 'df_credits' not in locals() or df is None:
         return {"mensaje": "Error: DataFrames 'df' o 'df_credits' no cargados."}
     peliculas_actor = df_credits[df_credits['name'].str.lower() == nombre_actor.lower()]
     if peliculas_actor.empty:
@@ -77,7 +79,7 @@ def get_actor(nombre_actor: str):
     }
 
 def get_director(nombre_director: str):
-    if df_credits is None or df is None:
+    if 'df_credits' not in locals() or df is None:
         return {"mensaje": "Error: DataFrames 'df' o 'df_credits' no cargados."}
     peliculas_director = df_credits[(df_credits['job'] == 'Director') & (df_credits['name'].str.lower() == nombre_director.lower())]
     if peliculas_director.empty:
