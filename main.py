@@ -65,8 +65,8 @@ def votos_titulo(titulo_de_la_filmacion: str):
     return {"mensaje": f"La película '{pelicula['title'].iloc[0]}' fue estrenada en el año {anio_estreno}. La misma cuenta con un total de {cantidad_votos} valoraciones, con un promedio de {promedio_votos}."}
 
 def get_actor(nombre_actor: str):
-    if 'df_credits' not in locals() or df is None:
-        return {"mensaje": "Error: DataFrames 'df' o 'df_credits' no cargados."}
+    if df is None:
+        return {"mensaje": "Error: DataFrame no cargado."}
     peliculas_actor = df_credits[df_credits['name'].str.lower() == nombre_actor.lower()]
     if peliculas_actor.empty:
         return {"mensaje": f"No se encontró al actor '{nombre_actor}' o no tiene películas en el dataset."}
@@ -79,8 +79,8 @@ def get_actor(nombre_actor: str):
     }
 
 def get_director(nombre_director: str):
-    if 'df_credits' not in locals() or df is None:
-        return {"mensaje": "Error: DataFrames 'df' o 'df_credits' no cargados."}
+    if df is None:
+        return {"mensaje": "Error: DataFrameno cargado."}
     peliculas_director = df_credits[(df_credits['job'] == 'Director') & (df_credits['name'].str.lower() == nombre_director.lower())]
     if peliculas_director.empty:
         return {"mensaje": f"No se encontró al director '{nombre_director}' o no tiene películas en el dataset."}
