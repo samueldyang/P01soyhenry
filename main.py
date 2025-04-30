@@ -67,7 +67,7 @@ def votos_titulo(titulo_de_la_filmacion: str):
 def get_actor(nombre_actor: str):
     if df is None:
         return {"mensaje": "Error: DataFrame no cargado."}
-    peliculas_actor = df_credits[df_credits['name'].str.lower() == nombre_actor.lower()]
+    peliculas_actor = df[df['name'].str.lower() == nombre_actor.lower()]
     if peliculas_actor.empty:
         return {"mensaje": f"No se encontró al actor '{nombre_actor}' o no tiene películas en el dataset."}
     ids_peliculas_actor = peliculas_actor['id'].unique().tolist()
@@ -81,7 +81,7 @@ def get_actor(nombre_actor: str):
 def get_director(nombre_director: str):
     if df is None:
         return {"mensaje": "Error: DataFrameno cargado."}
-    peliculas_director = df_credits[(df_credits['job'] == 'Director') & (df_credits['name'].str.lower() == nombre_director.lower())]
+    peliculas_director = df[(df['job'] == 'Director') & (df['name'].str.lower() == nombre_director.lower())]
     if peliculas_director.empty:
         return {"mensaje": f"No se encontró al director '{nombre_director}' o no tiene películas en el dataset."}
     ids_peliculas_director = peliculas_director['movie_id'].tolist()
